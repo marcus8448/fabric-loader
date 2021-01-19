@@ -23,6 +23,6 @@ public final class GameProviders {
 	private GameProviders() { }
 
 	public static List<GameProvider> create() {
-		return Collections.singletonList(new MinecraftGameProvider());
+		return Collections.singletonList(new MindustryGameProvider());
 	}
 }

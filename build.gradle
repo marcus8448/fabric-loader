@@ -27,12 +27,15 @@ repositories {
 		name = 'mojang'
 		url = 'https://libraries.minecraft.net/'
 	}
+	flatDir {
+		dir 'mindustry'
+	}
 }
 
 dependencies {
 	minecraft "com.mojang:minecraft:1.16.4"
 	mappings "net.fabricmc:yarn:1.16.4+build.9:v2"
-
+	implementation(":desktop:")
 	// fabric-loader dependencies
 	implementation "org.ow2.asm:asm:${project.asm_version}"
 	implementation "org.ow2.asm:asm-analysis:${project.asm_version}"
