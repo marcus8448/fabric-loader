@@ -1,47 +1,57 @@
+import java.util.function.Function
+
 plugins {
 	id 'java'
 	id 'idea'
 	id 'eclipse'
 	id 'maven-publish'
 	id("org.cadixdev.licenser") version "0.5.0"
-	id("fabric-loom") version "0.5-SNAPSHOT"
+	id("fabric-loom-mindustry") version "0.6-SNAPSHOT"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-archivesBaseName = "fabric-loader"
+archivesBaseName = "fabric-loader-mindustry"
+
+loom.setIntermediaryUrl(new Function<String, Object>() {
+	@Override
+	Object apply(String s) {
+		return "file://" + System.getProperty("user.home") + "/.m2/repository/net/fabricmc/intermediary/" + s + "/intermediary-" + s + "-v2.jar"
+	}
+})
 
 // Fetch build number from Jenkins
 def ENV = System.getenv()
 version = version + (ENV.GITHUB_ACTIONS ? "" : "+local")
 
 repositories {
-	mavenCentral()
-	jcenter()
+	mavenLocal()
 	maven {
 		name = 'Fabric'
 		url = 'https://maven.fabricmc.net/'
 	}
+	mavenCentral()
+	jcenter()
 	maven {
 		name = 'mojang'
 		url = 'https://libraries.minecraft.net/'
 	}
-	flatDir {
-		dir 'mindustry'
-	}
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:1.16.4"
-	mappings "net.fabricmc:yarn:1.16.4+build.9:v2"
-	implementation(":desktop:")
+	mindustry "com.github.anuken:mindustry:122.1"
+	mappings "net.fabricmc:yarn:empty:v2"
+
 	// fabric-loader dependencies
 	implementation "org.ow2.asm:asm:${project.asm_version}"
 	implementation "org.ow2.asm:asm-analysis:${project.asm_version}"
 	implementation "org.ow2.asm:asm-commons:${project.asm_version}"
 	implementation "org.ow2.asm:asm-tree:${project.asm_version}"
 	implementation "org.ow2.asm:asm-util:${project.asm_version}"
+	implementation ('com.google.guava:guava:30.1-jre')
+	implementation ('org.apache.logging.log4j:log4j-api:2.8.1')
+	implementation ('org.apache.logging.log4j:log4j-core:2.8.1')
 
 	// Required for mixin annotation processor
 	annotationProcessor "org.ow2.asm:asm:${project.asm_version}"
@@ -62,12 +72,12 @@ dependencies {
 	implementation 'net.fabricmc:fabric-loader-sat4j:2.3.5.4'
 
 	// launchwrapper + dependencies
-	implementation ('net.minecraft:launchwrapper:1.12') {
-		transitive = false
-	}
+//	implementation ('net.minecraft:launchwrapper:1.12') {
+//		transitive = false
+//	}
 	implementation 'net.sf.jopt-simple:jopt-simple:5.0.3'
 
-	testCompileOnly 'org.jetbrains:annotations:19.0.0'
+	implementation 'org.jetbrains:annotations:20.1.0'
 
 	// Unit testing for mod metadata
 	testImplementation('org.junit.jupiter:junit-jupiter:5.6.2')
@@ -191,28 +201,29 @@ publishing {
 
 	// select the repositories you want to publish to
 	repositories {
-		if (ENV.MAVEN_URL) {
-			maven {
-				url ENV.MAVEN_URL
-				credentials {
-					username ENV.MAVEN_USERNAME
-					password ENV.MAVEN_PASSWORD
-				}
-			}
-		}
+//		if (ENV.MAVEN_URL) {
+//			maven {
+//				url ENV.MAVEN_URL
+//				credentials {
+//					username ENV.MAVEN_USERNAME
+//					password ENV.MAVEN_PASSWORD
+//				}
+//			}
+//		}
+		mavenLocal()
 	}
 }
-
-// A task to ensure that the version being released has not already been released.
-task checkVersion {
-	doFirst {
-		def xml = new URL("https://maven.fabricmc.net/net/fabricmc/fabric-loader/maven-metadata.xml").text
-		def metadata = new XmlSlurper().parseText(xml)
-		def versions = metadata.versioning.versions.version*.text();
-		if (versions.contains(version)) {
-			throw new RuntimeException("${version} has already been released!")
-		}
-	}
-}
-
-publish.mustRunAfter checkVersion
+//
+//// A task to ensure that the version being released has not already been released.
+//task checkVersion {
+//	doFirst {
+//		def xml = new URL("https://maven.fabricmc.net/net/fabricmc/fabric-loader/maven-metadata.xml").text
+//		def metadata = new XmlSlurper().parseText(xml)
+//		def versions = metadata.versioning.versions.version*.text();
+//		if (versions.contains(version)) {
+//			throw new RuntimeException("${version} has already been released!")
+//		}
+//	}
+//}
+//
+//publish.mustRunAfter checkVersion
