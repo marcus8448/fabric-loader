@@ -11,8 +11,7 @@ plugins {
 	id "com.github.johnrengelman.shadow" version "6.1.0"
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+targetCompatibility = sourceCompatibility = JavaVersion.VERSION_11
 
 archivesBaseName = "fabric-loader-mindustry"
 
@@ -132,11 +131,8 @@ tasks.build.dependsOn "copyJsonLw"
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 
-	// The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
-	// JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
-	// We'll use that if it's available, but otherwise we'll use the older option.
 	if (JavaVersion.current().isJava9Compatible()) {
-		it.options.release = 8
+		it.options.release = 11
 	}
 }
 
@@ -149,16 +145,16 @@ javadoc {
 		if (file("README.html").exists()) {
 			overview = "README.html"
 		}
-		source = "8"
+		source = "11"
 		encoding = 'UTF-8'
 		charSet = 'UTF-8'
 		memberLevel = JavadocMemberLevel.PACKAGE
 		links(
 				'https://asm.ow2.io/javadoc/',
-				'https://docs.oracle.com/javase/8/docs/api/',
+				'https://docs.oracle.com/javase/11/docs/api/',
 				'https://logging.apache.org/log4j/2.x/log4j-api/apidocs/'
 		)
-		// Disable the crazy super-strict doclint tool in Java 8
+		// Disable the crazy super-strict doclint tool in Java 11
 		addStringOption('Xdoclint:none', '-quiet')
 	}
 	source sourceSets.main.allJava.srcDirs
